@@ -1,0 +1,4 @@
+
+### **12. Vercel Functions (Optional)**
+
+Für zukünftige Features:
