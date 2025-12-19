@@ -1,205 +1,174 @@
-import { useState } from 'react';
+import React from 'react';
 import { Element } from '../types/Element';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Slider } from '../components/ui/slider';
-import { Button } from '../components/ui/button';
-import { Trash2, RotateCw } from 'lucide-react';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Label } from './ui/Label';
+import { Slider } from './ui/Slider';
+import { Trash2 } from 'lucide-react';
 
 interface PropertyPanelProps {
   element: Element;
-  onUpdate: (updates: Partial<Element>) => void;
-  onDelete: () => void;
+  updateElement: (id: string, updates: Partial<Element>) => void;
+  deleteElement: (id: string) => void;
 }
 
-export const PropertyPanel = ({ element, onUpdate, onDelete }: PropertyPanelProps) => {
-  const [localElement, setLocalElement] = useState(element);
-
-  const handleUpdate = (key: keyof Element, value: any) => {
-    const updated = { ...localElement, [key]: value };
-    setLocalElement(updated);
-    onUpdate({ [key]: value });
-  };
-
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({
+  element,
+  updateElement,
+  deleteElement
+}) => {
   return (
     <div className="w-80 bg-gray-900 border-l border-cyan-500/30 p-4 overflow-y-auto">
-      <h3 className="text-white font-bold text-lg mb-4">Properties</h3>
-      
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-cyan-400 font-bold">Properties</h3>
+        <Button
+          size="sm"
+          variant="destructive"
+          onClick={() => deleteElement(element.id)}
+        >
+          <Trash2 size={14} />
+        </Button>
+      </div>
+
       <div className="space-y-4">
-        {/* Text Content */}
+        {/* Text */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">Text</Label>
+          <Label className="text-xs text-gray-400">Text</Label>
           <Input
-            value={localElement.text}
-            onChange={(e) => handleUpdate('text', e.target.value)}
-            className="mt-2 bg-gray-800 border-cyan-500/30 text-white"
+            value={element.text}
+            onChange={(e) => updateElement(element.id, { text: e.target.value })}
+            className="mt-1"
           />
         </div>
 
-        {/* Colors */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="text-white text-xs uppercase tracking-wider font-bold">Text Color</Label>
+        {/* Color */}
+        <div>
+          <Label className="text-xs text-gray-400">Text Color</Label>
+          <div className="flex gap-2 mt-1">
             <input
               type="color"
-              value={localElement.color}
-              onChange={(e) => handleUpdate('color', e.target.value)}
-              className="mt-2 w-full h-10 bg-gray-800 border border-cyan-500/30 rounded cursor-pointer"
+              value={element.color}
+              onChange={(e) => updateElement(element.id, { color: e.target.value })}
+              className="w-12 h-10 bg-gray-800 border border-gray-600 rounded cursor-pointer"
             />
-          </div>
-          <div>
-            <Label className="text-white text-xs uppercase tracking-wider font-bold">Background</Label>
-            <input
-              type="color"
-              value={localElement.backgroundColor === 'transparent' ? '#1a1a2e' : localElement.backgroundColor}
-              onChange={(e) => handleUpdate('backgroundColor', e.target.value)}
-              className="mt-2 w-full h-10 bg-gray-800 border border-cyan-500/30 rounded cursor-pointer"
+            <Input
+              value={element.color}
+              onChange={(e) => updateElement(element.id, { color: e.target.value })}
             />
           </div>
         </div>
 
-        {/* Size */}
+        {/* Background Color */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Width: {localElement.width}px
-          </Label>
+          <Label className="text-xs text-gray-400">Background</Label>
+          <div className="flex gap-2 mt-1">
+            <input
+              type="color"
+              value={element.backgroundColor}
+              onChange={(e) => updateElement(element.id, { backgroundColor: e.target.value })}
+              className="w-12 h-10 bg-gray-800 border border-gray-600 rounded cursor-pointer"
+            />
+            <Input
+              value={element.backgroundColor}
+              onChange={(e) => updateElement(element.id, { backgroundColor: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Width */}
+        <div>
+          <Label className="text-xs text-gray-400">Width: {element.width}px</Label>
           <Slider
-            value={[localElement.width]}
-            onValueChange={([value]) => handleUpdate('width', value)}
-            max={500}
+            value={element.width}
+            onValueChange={(value) => updateElement(element.id, { width: value })}
             min={50}
-            step={10}
-            className="mt-2"
+            max={400}
+            className="mt-1"
           />
         </div>
 
+        {/* Height */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Height: {localElement.height}px
-          </Label>
+          <Label className="text-xs text-gray-400">Height: {element.height}px</Label>
           <Slider
-            value={[localElement.height]}
-            onValueChange={([value]) => handleUpdate('height', value)}
-            max={300}
+            value={element.height}
+            onValueChange={(value) => updateElement(element.id, { height: value })}
             min={20}
-            step={10}
-            className="mt-2"
+            max={200}
+            className="mt-1"
           />
         </div>
 
         {/* Rotation */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold flex items-center gap-2">
-            <RotateCw className="w-3 h-3" />
-            Rotation: {localElement.rotation}°
-          </Label>
+          <Label className="text-xs text-gray-400">Rotation: {element.rotation}°</Label>
           <Slider
-            value={[localElement.rotation]}
-            onValueChange={([value]) => handleUpdate('rotation', value)}
-            max={30}
+            value={element.rotation}
+            onValueChange={(value) => updateElement(element.id, { rotation: value })}
             min={-30}
-            step={1}
-            className="mt-2"
-          />
-        </div>
-
-        {/* Opacity */}
-        <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Opacity: {Math.round(localElement.opacity * 100)}%
-          </Label>
-          <Slider
-            value={[localElement.opacity]}
-            onValueChange={([value]) => handleUpdate('opacity', value)}
-            max={1}
-            min={0}
-            step={0.1}
-            className="mt-2"
+            max={30}
+            className="mt-1"
           />
         </div>
 
         {/* Font Size */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Font Size: {localElement.fontSize}px
-          </Label>
+          <Label className="text-xs text-gray-400">Font Size: {element.fontSize}px</Label>
           <Slider
-            value={[localElement.fontSize]}
-            onValueChange={([value]) => handleUpdate('fontSize', value)}
-            max={72}
-            min={8}
-            step={2}
-            className="mt-2"
+            value={element.fontSize}
+            onValueChange={(value) => updateElement(element.id, { fontSize: value })}
+            min={10}
+            max={48}
+            className="mt-1"
           />
         </div>
 
         {/* Border Radius */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Border Radius: {localElement.borderRadius}px
-          </Label>
+          <Label className="text-xs text-gray-400">Border Radius: {element.borderRadius}px</Label>
           <Slider
-            value={[localElement.borderRadius]}
-            onValueChange={([value]) => handleUpdate('borderRadius', value)}
+            value={element.borderRadius}
+            onValueChange={(value) => updateElement(element.id, { borderRadius: value })}
+            min={0}
             max={50}
-            min={0}
-            step={2}
-            className="mt-2"
+            className="mt-1"
           />
         </div>
 
-        {/* Border Width */}
+        {/* Opacity */}
         <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">
-            Border Width: {localElement.borderWidth}px
-          </Label>
+          <Label className="text-xs text-gray-400">Opacity: {Math.round(element.opacity * 100)}%</Label>
           <Slider
-            value={[localElement.borderWidth]}
-            onValueChange={([value]) => handleUpdate('borderWidth', value)}
-            max={10}
-            min={0}
-            step={1}
-            className="mt-2"
+            value={element.opacity}
+            onValueChange={(value) => updateElement(element.id, { opacity: value })}
+            min={0.1}
+            max={1}
+            step={0.1}
+            className="mt-1"
           />
         </div>
 
-        {/* Border Style */}
-        <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">Border Style</Label>
-          <select
-            value={localElement.borderStyle}
-            onChange={(e) => handleUpdate('borderStyle', e.target.value)}
-            className="mt-2 w-full px-3 py-2 bg-gray-800 border border-cyan-500/30 rounded text-white"
-          >
-            <option value="none">None</option>
-            <option value="solid">Solid</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-          </select>
+        {/* Position */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs text-gray-400">X: {Math.round(element.x)}</Label>
+            <Input
+              type="number"
+              value={Math.round(element.x)}
+              onChange={(e) => updateElement(element.id, { x: Number(e.target.value) })}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-gray-400">Y: {Math.round(element.y)}</Label>
+            <Input
+              type="number"
+              value={Math.round(element.y)}
+              onChange={(e) => updateElement(element.id, { y: Number(e.target.value) })}
+              className="mt-1"
+            />
+          </div>
         </div>
-
-        {/* Font Weight */}
-        <div>
-          <Label className="text-white text-xs uppercase tracking-wider font-bold">Font Weight</Label>
-          <select
-            value={localElement.fontWeight}
-            onChange={(e) => handleUpdate('fontWeight', e.target.value)}
-            className="mt-2 w-full px-3 py-2 bg-gray-800 border border-cyan-500/30 rounded text-white"
-          >
-            <option value="normal">Normal</option>
-            <option value="bold">Bold</option>
-            <option value="900">Black</option>
-          </select>
-        </div>
-
-        {/* Delete Button */}
-        <Button
-          onClick={onDelete}
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-medium"
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Delete Element
-        </Button>
       </div>
     </div>
   );

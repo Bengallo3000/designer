@@ -24,8 +24,8 @@ export interface Element {
   opacity: number;
   borderRadius: number;
   fontSize: number;
-  fontWeight: 'normal' | 'bold' | '900';
-  borderStyle: 'none' | 'solid' | 'dashed' | 'dotted';
+  fontWeight: string;
+  borderStyle: string;
   borderColor: string;
   borderWidth: number;
   zIndex: number;
@@ -37,6 +37,8 @@ export interface HistoryState {
 }
 
 export interface Template {
+  id: string;
   name: string;
-  elements: Element[];
+  description: string;
+  elements: Partial<Element>[];
 }
